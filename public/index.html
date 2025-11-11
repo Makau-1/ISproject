@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISproject - Secure User Management</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Secure user management system built with Node.js, Express, and MySQL">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 ISproject User Management</h1>
+            <p>Secure full-stack application with Node.js + Express + MySQL | Password Hashing & Input Validation</p>
+        </header>
+
+        <div class="main-content">
+            <!-- User Registration Form -->
+            <section class="form-section">
+                <h2>📝 Register New User</h2>
+                <form id="userForm" novalidate>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required 
+                            minlength="3"
+                            maxlength="30"
+                            pattern="[a-zA-Z][a-zA-Z0-9_]*"
+                            placeholder="Enter username (3-30 characters, letters/numbers/underscores)"
+                            title="Username must start with a letter and contain only letters, numbers, and underscores"
+                        >
+                        <span id="usernameError" class="error-message"></span>
+                        <div class="input-hint">
+                            💡 Must start with a letter, 3-30 characters, letters/numbers/underscores only
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            minlength="6"
+                            maxlength="100"
+                            placeholder="Enter strong password (min 6 characters)"
+                            title="Password must include uppercase, lowercase, number, and special character"
+                        >
+                        <span id="passwordError" class="error-message"></span>
+                        <div id="passwordStrength" class="password-strength"></div>
+                        <div class="input-hint">
+                            🔒 Must include: uppercase, lowercase, number, special character, min 6 chars
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">
+                        <span class="btn-text">🚀 Register User</span>
+                        <span class="btn-loading" style="display: none;">⏳ Processing...</span>
+                    </button>
+                </form>
+
+                <!-- Password Requirements Summary -->
+                <div class="requirements-card">
+                    <h3>📋 Password Requirements:</h3>
+                    <ul>
+                        <li id="req-length">✅ At least 6 characters</li>
+                        <li id="req-lowercase">✅ One lowercase letter (a-z)</li>
+                        <li id="req-uppercase">✅ One uppercase letter (A-Z)</li>
+                        <li id="req-number">✅ One number (0-9)</li>
+                        <li id="req-special">✅ One special character (!@#$% etc.)</li>
+                        <li id="req-repeat">✅ No three identical characters in a row</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Users Display Section -->
+            <section class="users-section">
+                <div class="section-header">
+                    <h2>👥 Registered Users</h2>
+                    <div class="users-controls">
+                        <button id="loadUsers" class="load-btn">
+                            <span class="btn-text">🔄 Load Users</span>
+                            <span class="btn-loading" style="display: none;">⏳ Loading...</span>
+                        </button>
+                        <span id="usersCount" class="users-count">0 users</span>
+                    </div>
+                </div>
+                
+                <div id="usersList" class="users-list">
+                    <div class="no-users">
+                        <p>📭 No users registered yet</p>
+                        <p class="hint">Register a user to see them here!</p>
+                    </div>
+                </div>
+
+                <!-- Users Statistics -->
+                <div class="stats-card">
+                    <h3>📊 Quick Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalUsers">0</span>
+                            <span class="stat-label">Total Users</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="todayUsers">0</span>
+                            <span class="stat-label">Registered Today</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="message" class="message hidden"></div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>🛡️ <strong>ISproject</strong> - Secure Cloud Deployment Ready | Built with Node.js + Express + MySQL</p>
+                <p class="tech-stack">🔧 Technologies: HTML5, CSS3, JavaScript, bcrypt, Input Validation, CORS, Helmet</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
