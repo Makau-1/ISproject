@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('./database');  // FIXED: points to root-level database.js
 const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
@@ -33,7 +33,7 @@ const User = sequelize.define('User', {
 });
 
 // Instance method to check password
-User.prototype.checkPassword = function(password) {
+User.prototype.checkPassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
