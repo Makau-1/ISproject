@@ -111,7 +111,8 @@ app.get('/api/health', (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.findAll({
-            attributes: { exclude: ['password'] }
+            attributes: { exclude: ['password'] },
+            order: [['createdAt', 'DESC']]
         });
         res.json({
             success: true,
@@ -133,29 +134,32 @@ app.post('/api/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
+        console.log('📝 Registration attempt:', { username, email: email ? '@' : 'missing' });
+
         // Validate username
         const vUser = validateUsername(username);
         if (!vUser.valid) {
+            console.log('❌ Username validation failed:', vUser.message);
             return res.status(400).json({ 
                 success: false,
                 message: vUser.message 
             });
         }
 
-        // Validate email (if your User model has email field)
-        if (email) {
-            const vEmail = validateEmail(email);
-            if (!vEmail.valid) {
-                return res.status(400).json({ 
-                    success: false,
-                    message: vEmail.message 
-                });
-            }
+        // Validate email (REQUIRED)
+        const vEmail = validateEmail(email);
+        if (!vEmail.valid) {
+            console.log('❌ Email validation failed:', vEmail.message);
+            return res.status(400).json({ 
+                success: false,
+                message: vEmail.message 
+            });
         }
 
         // Validate password
         const vPass = validatePassword(password);
         if (!vPass.valid) {
+            console.log('❌ Password validation failed:', vPass.message);
             return res.status(400).json({ 
                 success: false,
                 message: vPass.message 
@@ -164,31 +168,38 @@ app.post('/api/register', async (req, res) => {
 
         // Sanitize inputs
         const sanitizedUsername = sanitizeInput(vUser.value);
-        const sanitizedEmail = email ? sanitizeInput(email.trim().toLowerCase()) : null;
+        const sanitizedEmail = sanitizeInput(vEmail.value);
 
-        // Check if user already exists
-        const whereClause = email 
-            ? { [sequelize.Sequelize.Op.or]: [
-                { username: sanitizedUsername },
-                { email: sanitizedEmail }
-              ]}
-            : { username: sanitizedUsername };
+        console.log('✅ All validations passed. Checking for existing user...');
 
-        const existingUser = await User.findOne({ where: whereClause });
+        // Check if user already exists (by username OR email)
+        const existingUser = await User.findOne({ 
+            where: { 
+                [sequelize.Sequelize.Op.or]: [
+                    { username: sanitizedUsername },
+                    { email: sanitizedEmail }
+                ]
+            }
+        });
         
         if (existingUser) {
+            console.log('❌ User already exists');
             return res.status(409).json({ 
                 success: false,
                 message: 'Username or email already exists' 
             });
         }
 
-        // Create user (password will be hashed by User model hooks)
-        const userData = email 
-            ? { username: sanitizedUsername, email: sanitizedEmail, password: vPass.value }
-            : { username: sanitizedUsername, password: vPass.value };
+        console.log('✅ User does not exist. Creating new user...');
 
-        const newUser = await User.create(userData);
+        // Create user (password will be hashed by User model hooks)
+        const newUser = await User.create({
+            username: sanitizedUsername,
+            email: sanitizedEmail,
+            password: vPass.value
+        });
+
+        console.log('✅ User created successfully:', newUser.id);
 
         res.status(201).json({
             success: true,
@@ -196,13 +207,13 @@ app.post('/api/register', async (req, res) => {
             user: {
                 id: newUser.id,
                 username: newUser.username,
-                email: newUser.email || undefined,
+                email: newUser.email,
                 createdAt: newUser.createdAt
             }
         });
 
     } catch (error) {
-        console.error('Registration error:', error);
+        console.error('❌ Registration error:', error);
 
         // Handle Sequelize validation errors
         if (error.name === 'SequelizeValidationError') {
@@ -282,7 +293,7 @@ app.post('/api/login', async (req, res) => {
             user: {
                 id: user.id,
                 username: user.username,
-                email: user.email || undefined
+                email: user.email
             }
         });
 
