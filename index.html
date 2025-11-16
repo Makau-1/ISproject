@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ISproject - Secure User Management</title>
     <link rel="stylesheet" href="style.css">
-    <meta name="description" content="Secure user management system built with Node.js, Express, and MySQL">
+    <meta name="description" content="Secure user management system built with Node.js, Express, and PostgreSQL">
     <style>
         /* Embedded styles for immediate visual feedback */
         .error-message {
@@ -51,7 +51,7 @@
     <div class="container">
         <header>
             <h1>🔐 ISproject User Management</h1>
-            <p>Secure full-stack application with Node.js + Express + MySQL | Password Hashing & Input Validation</p>
+            <p>Secure full-stack application with Node.js + Express + PostgreSQL | Password Hashing & Input Validation</p>
         </header>
 
         <div class="main-content">
@@ -67,16 +67,28 @@
                             name="username" 
                             required 
                             minlength="3"
-                            maxlength="30"
+                            maxlength="50"
                             pattern="[a-zA-Z][a-zA-Z0-9_]*"
-                            placeholder="Enter username (3-30 characters, letters/numbers/underscores)"
+                            placeholder="Enter username (3-50 characters, letters/numbers/underscores)"
                             title="Username must start with a letter and contain only letters, numbers, and underscores"
                         >
                         <span id="usernameError" class="error-message"></span>
                         <div class="input-hint">
-                            💡 Must start with a letter, 3-30 characters, letters/numbers/underscores only
+                            💡 Must start with a letter, 3-50 characters, letters/numbers/underscores only
                         </div>
                     </div>
+
+                    <!-- Optional: Add email field if your User model has it -->
+                    <!-- <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="Enter email address"
+                        >
+                        <span id="emailError" class="error-message"></span>
+                    </div> -->
                     
                     <div class="form-group">
                         <label for="password">Password:</label>
@@ -85,15 +97,15 @@
                             id="password" 
                             name="password" 
                             required 
-                            minlength="6"
+                            minlength="8"
                             maxlength="100"
-                            placeholder="Enter strong password (min 6 characters)"
+                            placeholder="Enter strong password (min 8 characters)"
                             title="Password must include uppercase, lowercase, number, and special character"
                         >
                         <span id="passwordError" class="error-message"></span>
                         <div id="passwordStrength" class="password-strength"></div>
                         <div class="input-hint">
-                            🔒 Must include: uppercase, lowercase, number, special character, min 6 chars
+                            🔒 Must include: uppercase, lowercase, number, special character, min 8 chars
                         </div>
                     </div>
                     
@@ -107,11 +119,11 @@
                 <div class="requirements-card">
                     <h3>📋 Password Requirements:</h3>
                     <ul>
-                        <li id="req-length">✅ At least 6 characters</li>
-                        <li id="req-lowercase">✅ One lowercase letter (a-z)</li>
-                        <li id="req-uppercase">✅ One uppercase letter (A-Z)</li>
-                        <li id="req-number">✅ One number (0-9)</li>
-                        <li id="req-special">✅ One special character (!@#$% etc.)</li>
+                        <li id="req-length">⏹ At least 8 characters</li>
+                        <li id="req-lowercase">⏹ One lowercase letter (a-z)</li>
+                        <li id="req-uppercase">⏹ One uppercase letter (A-Z)</li>
+                        <li id="req-number">⏹ One number (0-9)</li>
+                        <li id="req-special">⏹ One special character (!@#$% etc.)</li>
                     </ul>
                 </div>
             </section>
@@ -159,8 +171,9 @@
         <!-- Footer -->
         <footer class="app-footer">
             <div class="footer-content">
-                <p>🛡️ <strong>ISproject</strong> - Secure Cloud Deployment Ready | Built with Node.js + Express + MySQL</p>
-                <p class="tech-stack">🔧 Technologies: HTML5, CSS3, JavaScript, BCrypt Password Hashing, Input Validation, HTTPS, CORS</p>
+                <p>🛡 <strong>ISproject</strong> - Secure Cloud Deployment on Azure | Built with Node.js + Express + PostgreSQL</p>
+                <p class="tech-stack">🔧 Technologies: HTML5, CSS3, JavaScript, BCrypt Password Hashing, Sequelize ORM, Input Validation, HTTPS, CORS</p>
+                <p class="deployment-info">☁ Deployed on: Azure App Service | Database: Azure PostgreSQL | Domain: makaualex.space</p>
             </div>
         </footer>
     </div>
@@ -188,12 +201,13 @@
         usernameInput.addEventListener('input', function() {
             const username = this.value;
             usernameError.textContent = '';
+            usernameError.style.color = '#dc3545';
             
             if (username.length > 0) {
                 if (username.length < 3) {
                     usernameError.textContent = '❌ Username must be at least 3 characters';
-                } else if (username.length > 30) {
-                    usernameError.textContent = '❌ Username must not exceed 30 characters';
+                } else if (username.length > 50) {
+                    usernameError.textContent = '❌ Username must not exceed 50 characters';
                 } else if (!/^[a-zA-Z]/.test(username)) {
                     usernameError.textContent = '❌ Username must start with a letter';
                 } else if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(username)) {
@@ -209,6 +223,7 @@
         passwordInput.addEventListener('input', function() {
             const password = this.value;
             passwordError.textContent = '';
+            passwordError.style.color = '#dc3545';
             
             if (password.length === 0) {
                 passwordStrength.className = 'password-strength';
@@ -218,7 +233,7 @@
             }
 
             // Check requirements
-            const hasLength = password.length >= 6;
+            const hasLength = password.length >= 8;
             const hasLowercase = /[a-z]/.test(password);
             const hasUppercase = /[A-Z]/.test(password);
             const hasNumber = /[0-9]/.test(password);
@@ -244,7 +259,7 @@
 
             // Show error if not all requirements met
             if (!hasLength || !hasLowercase || !hasUppercase || !hasNumber || !hasSpecial) {
-                passwordError.textContent = '⚠️ Password does not meet all requirements';
+                passwordError.textContent = '⚠ Password does not meet all requirements';
             } else {
                 passwordError.textContent = '✅ Strong password';
                 passwordError.style.color = '#28a745';
@@ -254,17 +269,17 @@
         function updateRequirement(element, isValid) {
             if (isValid) {
                 element.className = 'valid';
-                element.innerHTML = element.innerHTML.replace(/❌|⏹️|✅/, '✅');
+                element.innerHTML = element.innerHTML.replace(/❌|⏹|✅/, '✅');
             } else {
                 element.className = 'invalid';
-                element.innerHTML = element.innerHTML.replace(/❌|⏹️|✅/, '❌');
+                element.innerHTML = element.innerHTML.replace(/❌|⏹|✅/, '❌');
             }
         }
 
         function resetRequirements() {
             [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => {
                 el.className = '';
-                el.innerHTML = el.innerHTML.replace(/❌|✅/, '⏹️');
+                el.innerHTML = el.innerHTML.replace(/❌|✅/, '⏹');
             });
         }
 
@@ -283,7 +298,7 @@
             toggleLoadingState(submitBtn, true);
 
             try {
-                const response = await fetch('/api/users', {
+                const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -293,12 +308,14 @@
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    showMessage('✅ User registered successfully! Password securely hashed.', 'success');
+                if (data.success) {
+                    showMessage('✅ ' + data.message + ' Password securely hashed!', 'success');
                     userForm.reset();
                     passwordStrength.className = 'password-strength';
                     passwordStrength.style.background = '#e9ecef';
                     resetRequirements();
+                    usernameError.textContent = '';
+                    passwordError.textContent = '';
                     loadUsers();
                 } else {
                     showMessage('❌ ' + data.message, 'error');
@@ -318,14 +335,17 @@
             
             try {
                 const response = await fetch('/api/users');
-                const users = await response.json();
+                const data = await response.json();
 
                 const usersList = document.getElementById('usersList');
                 const usersCount = document.getElementById('usersCount');
                 const totalUsers = document.getElementById('totalUsers');
                 const todayUsers = document.getElementById('todayUsers');
 
-                if (users.length === 0) {
+                // Handle response format
+                const users = data.users || data;
+
+                if (!users || users.length === 0) {
                     usersList.innerHTML = `
                         <div class="no-users">
                             <p>📭 No users registered yet</p>
@@ -345,10 +365,11 @@
                                     <p class="user-meta">
                                         <span>🆔 ID: ${user.id}</span> | 
                                         <span>📅 ${formatDate(user.createdAt)}</span>
+                                        ${user.email ? ` | <span>📧 ${escapeHtml(user.email)}</span>` : ''}
                                     </p>
                                 </div>
                             </div>
-                            <div class="user-badge">🔒 Hashed</div>
+                            <div class="user-badge">🔒 BCrypt Hashed</div>
                         </div>
                     `).join('');
 
@@ -371,8 +392,8 @@
 
         // Validation functions
         function validateUsername(username) {
-            if (!username || username.length < 3 || username.length > 30) {
-                showMessage('❌ Username must be 3-30 characters long', 'error');
+            if (!username || username.length < 3 || username.length > 50) {
+                showMessage('❌ Username must be 3-50 characters long', 'error');
                 return false;
             }
             if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(username)) {
@@ -383,8 +404,8 @@
         }
 
         function validatePassword(password) {
-            if (password.length < 6) {
-                showMessage('❌ Password must be at least 6 characters long', 'error');
+            if (password.length < 8) {
+                showMessage('❌ Password must be at least 8 characters long', 'error');
                 return false;
             }
             if (!/[a-z]/.test(password)) {
@@ -409,7 +430,7 @@
         // Utility functions
         function showMessage(message, type) {
             messageDiv.textContent = message;
-            messageDiv.className = `message ${type}`;
+            messageDiv.className =` message ${type}`;
             messageDiv.classList.remove('hidden');
             
             setTimeout(() => {
@@ -433,6 +454,8 @@
         }
 
         function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            
             const date = new Date(dateString);
             const now = new Date();
             const diffMs = now - date;
@@ -453,6 +476,7 @@
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const map = {
                 '&': '&amp;',
                 '<': '&lt;',
@@ -460,7 +484,7 @@
                 '"': '&quot;',
                 "'": '&#039;'
             };
-            return text.replace(/[&<>"']/g, m => map[m]);
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
         }
 
         // Load users on page load

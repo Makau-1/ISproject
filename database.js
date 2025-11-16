@@ -32,7 +32,7 @@ if (process.env.DATABASE_URL) {
 } else {
     // Local PostgreSQL
     sequelize = new Sequelize(
-        process.env.DB_NAME || 'isprojectdb',
+        process.env.DB_NAME || 'serverprojectdb',
         process.env.DB_USER || 'postgres',
         process.env.DB_PASSWORD || '',
         {
